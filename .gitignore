@@ -1,0 +1,12 @@
+node_modules/
+dist/
+target/
+uploads/
+backend/uploads/
+*.log
+.env
+.env.local
+.idea/
+.vscode/
+*.iml
+.DS_Store

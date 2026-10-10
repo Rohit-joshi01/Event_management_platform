@@ -1,0 +1,101 @@
+@import '@fontsource-variable/space-grotesk';
+@import '@fontsource-variable/inter';
+@import '@fontsource/instrument-serif/400.css';
+@import '@fontsource/instrument-serif/400-italic.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    color-scheme: dark;
+    --nav-h: 72px;
+  }
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-rendering: optimizeLegibility;
+  }
+  body {
+    @apply bg-ink text-bone font-sans antialiased;
+    font-feature-settings: 'ss01', 'cv11';
+  }
+  ::selection {
+    background: #c7f36b;
+    color: #0a0a0a;
+  }
+  :focus-visible {
+    outline: 2px solid #c7f36b;
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+  .tnum {
+    font-variant-numeric: tabular-nums;
+  }
+  h1, h2, h3, h4 {
+    @apply font-display;
+  }
+  input[type='datetime-local']::-webkit-calendar-picker-indicator {
+    filter: invert(0.85);
+    cursor: pointer;
+  }
+  input[type='number']::-webkit-inner-spin-button {
+    opacity: 0.4;
+  }
+}
+
+@layer components {
+  .eyebrow {
+    @apply font-sans text-[11px] font-medium uppercase tracking-eyebrow text-mute;
+  }
+  .container-x {
+    @apply mx-auto w-full max-w-[1440px] px-4 sm:px-6 lg:px-10;
+  }
+  .hairline {
+    @apply border-line;
+  }
+  .link-underline {
+    background-image: linear-gradient(currentColor, currentColor);
+    background-size: 0% 1px;
+    background-position: 0 100%;
+    background-repeat: no-repeat;
+    transition: background-size 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .link-underline:hover,
+  .link-underline:focus-visible {
+    background-size: 100% 1px;
+  }
+  .grain {
+    position: relative;
+  }
+  .grain::after {
+    content: '';
+    pointer-events: none;
+    position: absolute;
+    inset: 0;
+    opacity: 0.05;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+  .scrollbar-none {
+    scrollbar-width: none;
+  }
+  .scrollbar-none::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+@media print {
+  body { background: #fff !important; color: #0a0a0a !important; }
+  aside, header, .print\:hidden, [aria-label='Breadcrumb'] { display: none !important; }
+  #app-main { padding: 0 !important; }
+  .lg\:pl-\[248px\], .lg\:pl-\[68px\] { padding-left: 0 !important; }
+}

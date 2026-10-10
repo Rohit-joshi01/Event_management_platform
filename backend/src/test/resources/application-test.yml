@@ -1,0 +1,17 @@
+spring:
+  datasource:
+    url: ${TEST_DATABASE_URL:jdbc:postgresql://localhost:5432/aftr_test}
+    username: ${TEST_DATABASE_USERNAME:aftr}
+    password: ${TEST_DATABASE_PASSWORD:aftr}
+    hikari:
+      maximum-pool-size: 30
+  flyway:
+    clean-disabled: false
+
+app:
+  seed:
+    enabled: false
+  rate-limit:
+    max-attempts: 10000
+  uploads:
+    dir: ./target/test-uploads

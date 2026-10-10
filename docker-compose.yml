@@ -1,0 +1,16 @@
+# Optional: PostgreSQL for local development if you'd rather not install it natively.
+#   docker compose up -d
+services:
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: aftr
+      POSTGRES_PASSWORD: aftr
+      POSTGRES_DB: aftr
+    ports:
+      - "5432:5432"
+    volumes:
+      - aftr-pg:/var/lib/postgresql/data
+      - ./backend/db/init-test-db.sql:/docker-entrypoint-initdb.d/init-test-db.sql:ro
+volumes:
+  aftr-pg:
