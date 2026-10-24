@@ -1,0 +1,6 @@
+# Local development profile: seeds the demo dataset (well-known demo passwords, see README).
+# Run with:  mvnw.cmd spring-boot:run -Dspring-boot.run.profiles=dev
+# Never enable this profile on a server that is reachable by other people.
+app:
+  seed:
+    enabled: true

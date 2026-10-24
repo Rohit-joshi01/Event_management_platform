@@ -9,7 +9,7 @@ AFTR is a full-stack event platform with three roles:
 | Layer    | Stack |
 |----------|-------|
 | Frontend | React 18 + TypeScript + Vite, Tailwind CSS, React Three Fiber / Three.js (3D hero), GSAP ScrollTrigger, Framer Motion, Recharts, Lucide, TanStack Query |
-| Backend  | **Java 21, Spring Boot 3.5** (Web, Security, Data JPA / Hibernate, Validation), Spring Session JDBC, Flyway, springdoc-openapi, Maven |
+| Backend  | **Java 17+, Spring Boot 3.5** (Web, Security, Data JPA / Hibernate, Validation), Spring Session JDBC, Flyway, springdoc-openapi, Maven |
 | Database | PostgreSQL 14+ |
 
 ```
@@ -38,8 +38,8 @@ aftr/
 
 ## 1. Prerequisites
 
-- **Java 21** (Temurin or Oracle JDK). Check with `java -version`.
-- **Maven 3.9+**. Check with `mvn -v`. IntelliJ IDEA's bundled Maven also works.
+- **JDK 17 or newer**. Check with `java -version`, and make sure `JAVA_HOME` points to the JDK.
+- **Maven is not required.** The project includes the Maven Wrapper (`mvnw` / `mvnw.cmd`). The first time you run it, it downloads Maven 3.9.11 by itself (needs internet). Wherever this guide says `mvn`, use `mvnw.cmd` on Windows or `./mvnw` on macOS/Linux.
 - **PostgreSQL 14+**, installed natively or run with `docker compose up -d`.
 - **Node.js 20+** and npm. Check with `node -v`.
 
@@ -65,8 +65,11 @@ This starts the same setup, including `aftr_test`.
 
 ```bash
 cd backend
-mvn spring-boot:run
+mvnw.cmd spring-boot:run -Dspring-boot.run.profiles=dev      # Windows (PowerShell: .\mvnw.cmd ... "-Dspring-boot.run.profiles=dev")
+./mvnw spring-boot:run -Dspring-boot.run.profiles=dev        # macOS / Linux
 ```
+
+The `dev` profile turns on the demo data below. Without it the app starts with an empty database, which is what you want on any server other people can reach.
 
 - The API runs at `http://localhost:8080`.
 - Swagger UI is at `http://localhost:8080/swagger-ui.html`.
@@ -74,12 +77,16 @@ mvn spring-boot:run
 The defaults match the database setup above. To override them, set environment variables; see `.env.example`. On Windows PowerShell:
 
 ```powershell
-$env:DATABASE_PASSWORD="your-password"; mvn spring-boot:run
+$env:DATABASE_PASSWORD="your-password"; .\mvnw.cmd spring-boot:run
 ```
 
-On the first start, with an empty `users` table, the app seeds a realistic demo dataset. It includes about 225 users, 22 events in every state, bookings spread over the last 30 days, notifications, announcements, approvals and audit entries. Seeded rows are flagged `is_seed`.
+If port 8080 is taken, add `--server.port=8081` (jar) or `-Dspring-boot.run.arguments=--server.port=8081`, and start the frontend with `VITE_DEV_BACKEND_URL=http://localhost:8081`.
 
-**Demo accounts**
+With the `dev` profile (or `SEED_DEMO_DATA=true`), on the first start with an empty `users` table, the app seeds a realistic demo dataset. It includes about 225 users, 22 events in every state, bookings spread over the last 30 days, notifications, announcements, approvals and audit entries. Seeded rows are flagged `is_seed`.
+
+**Demo accounts** (local development only)
+
+These passwords are public. Never run with seeding enabled on a deployed server: anyone could sign in as the admin. The sign-in page's click-to-fill helper only exists in `npm run dev` builds.
 
 | Role      | Email                | Password         |
 |-----------|----------------------|------------------|
@@ -94,9 +101,11 @@ To re-seed, drop and recreate the `aftr` database, then restart.
 You can also build a jar and run it:
 
 ```bash
-mvn -DskipTests package
-java -jar target/aftr-backend-1.0.0.jar
+mvnw.cmd -DskipTests package
+java -jar target/aftr-backend-1.0.0.jar --spring.profiles.active=dev   # drop the profile in production
 ```
+
+The JVM's default time zone is pinned to UTC at startup (all timestamps are stored in UTC). This also avoids a startup failure on Windows, where Java reports the legacy zone `Asia/Calcutta`, which PostgreSQL 16 rejects.
 
 ## 4. Run the frontend
 
@@ -127,8 +136,8 @@ The integration tests need a reachable `aftr_test` PostgreSQL database. Section 
 
 ```bash
 cd backend
-mvn test      # unit tests (*Test): validators, code generation, availability rules, purchase rules
-mvn verify    # also runs the integration tests (*IT)
+mvnw.cmd test      # unit tests (*Test): validators, code generation, availability rules, purchase rules
+mvnw.cmd verify    # also runs the integration tests (*IT)
 ```
 
 The integration tests boot the full application against PostgreSQL and use MockMvc. They cover:

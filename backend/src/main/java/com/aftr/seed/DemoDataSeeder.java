@@ -41,8 +41,8 @@ public class DemoDataSeeder implements ApplicationRunner {
         }
         long started = System.currentTimeMillis();
         writer.write();
-        log.info("Demo data seeded in {} ms. Sign in with admin@aftr.dev / Admin@2026, "
-                + "organizer@aftr.dev / Organizer@2026 or attendee@aftr.dev / Attendee@2026.",
+        log.warn("Demo data seeded in {} ms. Demo accounts use the well-known passwords from the README; "
+                + "do not run with seeding enabled on a publicly reachable server.",
                 System.currentTimeMillis() - started);
     }
 }

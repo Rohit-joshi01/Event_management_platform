@@ -3,6 +3,9 @@ package com.aftr.seed;
 import com.aftr.entity.*;
 import com.aftr.repository.*;
 import com.aftr.service.CodeGenerator;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.FlushModeType;
+import jakarta.persistence.PersistenceContext;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,6 +34,9 @@ public class DemoDataWriter {
     private final AuditLogRepository auditLogs;
     private final PasswordEncoder passwordEncoder;
     private final CodeGenerator codes;
+
+    @PersistenceContext
+    private EntityManager entityManager;
 
     private final Random random = new Random(20261010L);
     private Instant now;
@@ -319,13 +325,22 @@ public class DemoDataWriter {
         Instant windowStart = e.getPublishedAt();
         Instant windowEnd = earliest(e.getStartsAt().minus(Duration.ofHours(2)), now.minus(Duration.ofMinutes(30)));
         boolean past = e.getEndsAt().isBefore(now);
-        for (User u : shuffled) {
-            if (remaining <= 0) break;
-            if (!already.add(u.getId())) continue;
-            int qty = Math.min(remaining, Math.min(type.getMaxPerOrder(), 1 + (random.nextInt(10) < 6 ? 0 : random.nextInt(3))));
-            Instant at = between(windowStart, windowEnd);
-            booking(u, e, type, qty, at, past);
-            remaining -= qty;
+        // Each booking runs native inventory UPDATEs, which would otherwise auto-flush (and dirty-check)
+        // the whole, ever-growing persistence context. Inserts use IDENTITY ids and hit the database
+        // immediately, so one flush up front is enough; this keeps seeding linear instead of quadratic.
+        entityManager.flush();
+        entityManager.setFlushMode(FlushModeType.COMMIT);
+        try {
+            for (User u : shuffled) {
+                if (remaining <= 0) break;
+                if (!already.add(u.getId())) continue;
+                int qty = Math.min(remaining, Math.min(type.getMaxPerOrder(), 1 + (random.nextInt(10) < 6 ? 0 : random.nextInt(3))));
+                Instant at = between(windowStart, windowEnd);
+                booking(u, e, type, qty, at, past);
+                remaining -= qty;
+            }
+        } finally {
+            entityManager.setFlushMode(FlushModeType.AUTO);
         }
     }
 

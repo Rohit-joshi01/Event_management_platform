@@ -55,7 +55,7 @@ app:
   payments:
     dev-checkout-enabled: ${DEV_CHECKOUT_ENABLED:true}
   seed:
-    enabled: ${SEED_DEMO_DATA:true}
+    enabled: ${SEED_DEMO_DATA:false}
   uploads:
     dir: ${UPLOAD_DIR:./uploads}
     max-bytes: 5242880

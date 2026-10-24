@@ -13,7 +13,7 @@ const DEMO = [
   { role: 'Organizer', email: 'organizer@aftr.dev', password: 'Organizer@2026' },
   { role: 'Admin', email: 'admin@aftr.dev', password: 'Admin@2026' },
 ];
-const SHOW_DEMO = import.meta.env.DEV || import.meta.env.VITE_SHOW_DEMO_ACCOUNTS === 'true';
+const SHOW_DEMO = import.meta.env.DEV;
 
 /** Only same-site relative paths are honoured as post-login destinations. */
 function safeNext(next: string | null) {
